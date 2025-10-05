@@ -1,5 +1,6 @@
 package praktikum;
 
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,90 +13,107 @@ import static org.junit.Assert.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class BurgerTest {
 
-    private Burger burger;
-
     @Mock
     Bun mockBun;
-
     @Mock
     Ingredient mockSauce;
-
     @Mock
     Ingredient mockFilling;
+    private Burger burger;
+    private SoftAssertions softAssertions;
 
     @Before
     public void setUp() {
         burger = new Burger();
+        softAssertions = new SoftAssertions();
     }
 
 
     @Test
     public void setBunsTest() {
         burger.setBuns(mockBun);
-        assertEquals("Поле 'bun' = mockBun", mockBun, burger.bun);
-
+        assertEquals("Поле 'bun' должно быть установлено", mockBun, burger.bun);
     }
+
 
     @Test
     public void addIngredientTest() {
-        assertEquals("Список ингредиентов пуст", 0, burger.ingredients.size());
+        softAssertions.assertThat(burger.ingredients.size())
+                .as("Список ингредиентов должен быть пустым")
+                .isEqualTo(0);
 
         burger.addIngredient(mockSauce);
-        assertEquals("Добавили 1 ингредиент, размер списка стал 1", 1, burger.ingredients.size());
-        assertEquals("Первый элемент списка mockSauce", mockSauce, burger.ingredients.get(0));
+        softAssertions.assertThat(burger.ingredients.size())
+                .as("После добавления соуса, размер списка должен стать 1")
+                .isEqualTo(1);
+        softAssertions.assertThat(burger.ingredients.get(0))
+                .as("Первый элемент списка должен быть mockSauce")
+                .isEqualTo(mockSauce);
 
         burger.addIngredient(mockFilling);
-        assertEquals("добавили 2й, размер списка 2", 2, burger.ingredients.size());
-        assertEquals("Второй элемент в списке mockFilling", mockFilling, burger.ingredients.get(1));
+        softAssertions.assertThat(burger.ingredients.size())
+                .as("После добавления второго элемента, размер списка должен стать 2")
+                .isEqualTo(2);
+        softAssertions.assertThat(burger.ingredients.get(1))
+                .as("Второй элемент в списке должен быть mockFilling")
+                .isEqualTo(mockFilling);
+
+        softAssertions.assertAll();
     }
+
 
     @Test
     public void removeIngredientTest() {
         burger.addIngredient(mockSauce);
         burger.addIngredient(mockFilling);
-        assertEquals("В списке 2 элемента", 2, burger.ingredients.size());
 
         burger.removeIngredient(0);
-        assertEquals("После удаление 1 элемент в списке", 1, burger.ingredients.size());
-        assertEquals("Элемент на 0 индексе mockFilling", mockFilling, burger.ingredients.get(0));
+
+        softAssertions.assertThat(burger.ingredients.size())
+                .as("После удаления 1 элемент в списке")
+                .isEqualTo(1);
+        softAssertions.assertThat(burger.ingredients.get(0))
+                .as("Элемент на 0 индексе должен быть mockFilling (сдвинутый)")
+                .isEqualTo(mockFilling);
+
+        softAssertions.assertAll();
     }
+
 
     @Test
     public void removeOnlyOneIngredientTest() {
         burger.addIngredient(mockFilling);
         burger.removeIngredient(0);
-        assertEquals("Список пустой", 0, burger.ingredients.size());
+        assertEquals("Список должен стать пустым", 0, burger.ingredients.size());
     }
+
 
     @Test
     public void moveIngredientTest() {
         Ingredient mockCheese = Mockito.mock(Ingredient.class);
 
-
         burger.addIngredient(mockSauce);
         burger.addIngredient(mockCheese);
         burger.addIngredient(mockFilling);
 
-        assertEquals("В списке 3 элемента", 3, burger.ingredients.size());
-
-
-        assertEquals("Порядок элементов в списке индекс 0", mockSauce, burger.ingredients.get(0));
-        assertEquals("Порядок элементов в списке индекс 1", mockCheese, burger.ingredients.get(1));
-        assertEquals("Порядок элементов в списке индекс 2", mockFilling, burger.ingredients.get(2));
-
+        softAssertions.assertThat(burger.ingredients.size())
+                .as("В списке должно быть 3 элемента перед перемещением")
+                .isEqualTo(3);
 
         burger.moveIngredient(2, 0);
 
+        softAssertions.assertThat(burger.ingredients.get(0))
+                .as("Элемент на индексе 0 должен быть mockFilling (перемещенный)")
+                .isEqualTo(mockFilling);
 
-        assertEquals("Элемент на индексе 0 должен быть mockFilling (перемещенный)",
-                mockFilling, burger.ingredients.get(0));
+        softAssertions.assertThat(burger.ingredients.get(1))
+                .as("Элемент на индексе 1 должен быть mockSauce (сдвинутый)")
+                .isEqualTo(mockSauce);
 
-        assertEquals("Элемент на индексе 1 должен быть mockSauce (сдвинутый)",
-                mockSauce, burger.ingredients.get(1));
+        softAssertions.assertThat(burger.ingredients.get(2))
+                .as("Элемент на индексе 2 должен быть mockCheese (сдвинутый)")
+                .isEqualTo(mockCheese);
 
-        assertEquals("Элемент на индексе 2 должен быть mockCheese (сдвинутый)",
-                mockCheese, burger.ingredients.get(2));
+        softAssertions.assertAll();
     }
-
-
 }

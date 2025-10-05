@@ -20,6 +20,7 @@ public class BurgerPriceParameterizedTest {
     private final String bunName;
     private final List<IngredientEntry> ingredientEntries;
     private final float expectedPrice;
+
     public BurgerPriceParameterizedTest(float bunPrice, String bunName, List<IngredientEntry> ingredientEntries, float expectedPrice) {
         this.bunPrice = bunPrice;
         this.bunName = bunName;
